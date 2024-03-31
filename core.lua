@@ -276,7 +276,7 @@ local function LootAlertFrame_HandleChatMessage(message)
 			return link, 1, rollType, roll;
 		end
 	end
-  
+
 	return link, quantity, rollType, roll;
 end
 
@@ -289,7 +289,7 @@ function LootAlertFrame_OnEvent(self, event, ...)
 		local itemCreate				  = arg1:match(P_LOOT_ITEM_CREATED_SELF);
 		local count						  = arg1:match(P_LOOT_COUNT);
 		local itemRoll, _, rollType, roll = LootAlertFrame_HandleChatMessage(arg1);
-		
+
 		if not itemName and not player then
 			if itemCreate and creating then
 				itemName 	= itemCreate;
@@ -313,11 +313,20 @@ function LootAlertFrame_OnEvent(self, event, ...)
 			local heroic	  = iLevel >= 271 and not legendary;
 			local pets		  = subType == PET or subType == PETS;
 			local mounts	  = subType == ITEM_TYPE_MOUNT or subType == ITEM_TYPE_MOUNTS;
-			
+			local _, itemid   = strsplit(":", match(link, "item[%-?%d:]+"));
+			local special     = false;
+
+			for _, iid in ipairs(config.special_items) do
+				if tostring(itemid) == tostring(iid) then
+					special = true;
+					break;
+				end
+			end
+
 			if average then toast = "defaulttoast"; end
 			if common then toast = "commontoast"; end
 			if heroic then toast = "heroictoast"; end
-			
+
 			if legendary then
 				label = LEGENDARY_ITEM_LOOT_LABEL;
 				toast = "legendarytoast";
@@ -327,18 +336,17 @@ function LootAlertFrame_OnEvent(self, event, ...)
 			elseif mounts then
 				toast = "mounttoast";
 			end
-			
-			if config.filter then
+
+			if config.filter and not special then
 				for _, ignored in ipairs(config.filter_type) do
 					if tostring(itemType) == tostring(ignored) then
 						return;
 					end
 				end
 			end
-			-- print(itemType)
-			
+
 			if link then
-				LootAlertFrameMixIn:AddAlert(name, link, quality, texture, count, ignlevel, label, toast, rollType, roll);
+				LootAlertFrameMixIn:AddAlert(name, link, quality, texture, count, special or ignlevel, label, toast, rollType, roll);
 			end
 		end
 	end
