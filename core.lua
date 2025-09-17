@@ -386,8 +386,8 @@ function LootAlertFrame_OnEvent(self, event, ...)
 						local label = NEW_RECIPE_LEARNED_TITLE;
 						local toast = "recipetoast";
 						local tip = ERR_LEARN_RECIPE_S:gsub("%%s", skill);
-						local _, link, quality = GetItemInfo(recipe);
-						if link then
+						local _, link, quality, _, _, _, prof2 = GetItemInfo(recipe);
+						if link and prof2 == prof then
 							LootAlertFrameMixIn:AddAlert(skill, link, quality, picn, false, true, label, toast, false, false, tip, false, prof);
 						end
 					end
